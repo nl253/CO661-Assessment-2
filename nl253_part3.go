@@ -19,18 +19,6 @@ func sleepBetween(min int, max int) {
 	time.Sleep((time.Duration(min) + time.Duration(rand.Intn(min+max))) * time.Second)
 }
 
-func student(wait chan chan string, name string) {
-	logStudent(name, fmt.Sprintf("wants to meet"))
-	var dropInSess = make(chan string, 1)
-	dropInSess <- name
-	select {
-	case wait <- dropInSess:
-		logStudent(name, "found a place in the waiting room")
-	default:
-		logStudent(name, "waiting from is full, bye!")
-	}
-}
-
 func lecturer(wait chan chan string, name string, done chan bool) {
 
 	// prevent endless waiting once all students have been seen
@@ -48,7 +36,6 @@ func lecturer(wait chan chan string, name string, done chan bool) {
 			waitTime = 0 // reset counter
 			logLec(name, "a student in the queue, inviting in")
 			student := <-dropInSess
-			logLec(name, fmt.Sprintf("student name is %s", student))
 			logLec(name, fmt.Sprintf("drop in session started with %s...", student))
 			sleepBetween(2, 5)
 			logLec(name, fmt.Sprintf("drop in session finished, student %s has left", student))
@@ -60,6 +47,17 @@ func lecturer(wait chan chan string, name string, done chan bool) {
 	}
 }
 
+func student(wait chan chan string, name string) {
+	logStudent(name, fmt.Sprintf("wants to meet"))
+	var dropInSess = make(chan string, 1)
+	dropInSess <- name
+	select {
+	case wait <- dropInSess:
+		logStudent(name, "found a place in the waiting room")
+	default:
+		logStudent(name, "waiting from is full, bye!")
+	}
+}
 func main() {
 	noLects := 10
 	noStuds := 1000

@@ -32,7 +32,6 @@ func lecturer(wait chan chan string, lect chan bool) {
 		case dropInSess := <-wait:
 			logLec("a student in the queue, inviting in")
 			student := <-dropInSess
-			logLec(fmt.Sprintf("student name is %s", student))
 			logLec(fmt.Sprintf("drop in session started with %s...", student))
 			sleepBetween(2, 5)
 			logLec(fmt.Sprintf("drop in session finished, student %s has left", student))
